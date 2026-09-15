@@ -71,11 +71,11 @@ Traces: contract (GET /v1/greeting)
 Check: fetch_url
 
 **Scenario**: API returns internal error envelope for failed greeting query
-**Given**: Database is reachable, but the greeting query fails
+**Given**: Database is reachable, but the greeting query fails; no current automated fixture can arrange this while keeping the database connection available
 **When**: Client requests `GET /v1/greeting`
 **Then**: Response status is `500` and JSON body is exactly `{"error":{"code":"INTERNAL","message":"Internal server error."}}`
 Traces: contract (GET /v1/greeting)
-Check: fetch_url
+Check: manual
 
 **Scenario**: API returns unavailable envelope when database dependency is unavailable
 **Given**: Backend is running, but the database dependency refuses connections
