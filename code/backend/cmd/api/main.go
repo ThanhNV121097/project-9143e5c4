@@ -74,11 +74,11 @@ func getGreeting(db *sql.DB) http.HandlerFunc {
 func putGreeting(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var body struct {
-			Greeting string `json:"greeting"`
+			Greeting *string `json:"greeting"`
 		}
 		dec := json.NewDecoder(io.LimitReader(r.Body, 1<<20))
 		dec.DisallowUnknownFields()
-		if err := dec.Decode(&body); err != nil {
+		if err := dec.Decode(&body); err != nil || body.Greeting == nil {
 			writeError(w, http.StatusBadRequest, "MALFORMED_REQUEST", "Request body is malformed.")
 			return
 		}
@@ -86,7 +86,7 @@ func putGreeting(db *sql.DB) http.HandlerFunc {
 			writeError(w, http.StatusBadRequest, "MALFORMED_REQUEST", "Request body is malformed.")
 			return
 		}
-		greeting := strings.TrimSpace(body.Greeting)
+		greeting := strings.TrimSpace(*body.Greeting)
 		if greeting == "" {
 			writeError(w, http.StatusUnprocessableEntity, "VALIDATION_FAILED", "Greeting must not be empty.")
 			return
