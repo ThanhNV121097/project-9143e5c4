@@ -1,7 +1,7 @@
 "use client";
 
-import { FormEvent, useEffect, useRef, useState } from "react";
-import { getMockGreeting, saveMockGreeting } from "../lib/mock/edit-persisted-greeting";
+import { FormEvent, useRef, useState } from "react";
+import { saveGreeting } from "../lib/edit-persisted-greeting";
 import styles from "./EditPersistedGreeting.module.css";
 
 export type EditPersistedGreetingProps = {
@@ -13,14 +13,7 @@ export function EditPersistedGreeting({ initialGreeting }: EditPersistedGreeting
   const [inputValue, setInputValue] = useState(initialGreeting);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    const currentGreeting = getMockGreeting().greeting;
-
-    setGreeting(currentGreeting);
-    setInputValue(currentGreeting);
-  }, []);
-
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const nextGreeting = inputValue.trim();
@@ -30,7 +23,7 @@ export function EditPersistedGreeting({ initialGreeting }: EditPersistedGreeting
       return;
     }
 
-    const savedGreeting = saveMockGreeting(nextGreeting).greeting;
+    const savedGreeting = (await saveGreeting(nextGreeting)).greeting;
 
     setGreeting(savedGreeting);
     setInputValue(savedGreeting);

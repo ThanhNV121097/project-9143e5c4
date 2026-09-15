@@ -3,7 +3,10 @@ package main
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
 	"io/fs"
 	"log"
 	"net/http"
@@ -45,6 +48,8 @@ func main() {
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte("ok"))
 	})
+	mux.HandleFunc("GET /v1/greeting", getGreeting(db))
+	mux.HandleFunc("PUT /v1/greeting", putGreeting(db))
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = os.Getenv("APP_PORT")
@@ -53,6 +58,72 @@ func main() {
 		port = "8080"
 	}
 	log.Fatal(http.ListenAndServe(":"+port, mux))
+}
+
+func getGreeting(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var greeting string
+		if err := db.QueryRowContext(r.Context(), `SELECT text FROM greetings WHERE id = 1`).Scan(&greeting); err != nil {
+			writeStoreError(w, err)
+			return
+		}
+		writeJSON(w, http.StatusOK, map[string]string{"greeting": greeting})
+	}
+}
+
+func putGreeting(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var body struct {
+			Greeting *string `json:"greeting"`
+		}
+		dec := json.NewDecoder(io.LimitReader(r.Body, 1<<20))
+		dec.DisallowUnknownFields()
+		if err := dec.Decode(&body); err != nil || body.Greeting == nil {
+			writeError(w, http.StatusBadRequest, "MALFORMED_REQUEST", "Request body is malformed.")
+			return
+		}
+		if dec.Decode(&struct{}{}) != io.EOF {
+			writeError(w, http.StatusBadRequest, "MALFORMED_REQUEST", "Request body is malformed.")
+			return
+		}
+		greeting := strings.TrimSpace(*body.Greeting)
+		if greeting == "" {
+			writeError(w, http.StatusUnprocessableEntity, "VALIDATION_FAILED", "Greeting must not be empty.")
+			return
+		}
+		if err := db.QueryRowContext(r.Context(), `UPDATE greetings SET text = $1, updated_at = CURRENT_TIMESTAMP WHERE id = 1 RETURNING text`, greeting).Scan(&greeting); err != nil {
+			writeStoreError(w, err)
+			return
+		}
+		writeJSON(w, http.StatusOK, map[string]string{"greeting": greeting})
+	}
+}
+
+func writeStoreError(w http.ResponseWriter, err error) {
+	if isUnavailable(err) {
+		writeError(w, http.StatusServiceUnavailable, "UNAVAILABLE", "Service unavailable.")
+		return
+	}
+	writeError(w, http.StatusInternalServerError, "INTERNAL", "Internal server error.")
+}
+
+func isUnavailable(err error) bool {
+	return errors.Is(err, context.Canceled) || strings.Contains(err.Error(), "connection refused")
+}
+
+func writeJSON(w http.ResponseWriter, status int, body any) {
+	data, err := json.Marshal(body)
+	if err != nil {
+		http.Error(w, "internal", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(status)
+	_, _ = w.Write(data)
+}
+
+func writeError(w http.ResponseWriter, status int, code string, message string) {
+	writeJSON(w, status, map[string]map[string]string{"error": map[string]string{"code": code, "message": message}})
 }
 
 func migrate(ctx context.Context, db *sql.DB) error {
