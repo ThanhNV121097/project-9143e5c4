@@ -112,13 +112,18 @@ func isUnavailable(err error) bool {
 }
 
 func writeJSON(w http.ResponseWriter, status int, body any) {
+	data, err := json.Marshal(body)
+	if err != nil {
+		http.Error(w, "internal", http.StatusInternalServerError)
+		return
+	}
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(status)
-	_ = json.NewEncoder(w).Encode(body)
+	_, _ = w.Write(data)
 }
 
 func writeError(w http.ResponseWriter, status int, code string, message string) {
-	writeJSON(w, status, map[string]map[string]string{"error": {"code": code, "message": message}})
+	writeJSON(w, status, map[string]map[string]string{"error": map[string]string{"code": code, "message": message}})
 }
 
 func migrate(ctx context.Context, db *sql.DB) error {
