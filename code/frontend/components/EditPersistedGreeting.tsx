@@ -23,7 +23,7 @@ export function EditPersistedGreeting({ initialGreeting }: EditPersistedGreeting
       return;
     }
 
-    const savedGreeting = saveMockGreeting(nextGreeting).greeting;
+    const savedGreeting = (await saveGreeting(nextGreeting)).greeting;
 
     setGreeting(savedGreeting);
     setInputValue(savedGreeting);
