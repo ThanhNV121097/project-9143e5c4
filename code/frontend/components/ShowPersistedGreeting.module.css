@@ -5,8 +5,9 @@
   justify-content: center;
   min-height: calc(100vh - var(--space-12));
   text-align: center;
-  width: min(100%, 560px);
+  width: min(100%, calc(560px + var(--space-6) + var(--space-6)));
   margin: var(--space-0) auto;
+  padding: var(--space-0) var(--space-6);
 }
 
 .heading {
