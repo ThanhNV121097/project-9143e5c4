@@ -81,6 +81,7 @@
 @media (max-width: 520px) {
   .section {
     min-height: calc(100vh - var(--space-10));
+    padding: var(--space-0) var(--space-5);
   }
 
   .form {
