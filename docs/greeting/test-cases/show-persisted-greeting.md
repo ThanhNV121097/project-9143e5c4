@@ -35,10 +35,17 @@ Check: render_url
 Traces: SC-4 (GREETING-001 AC-4)
 Check: render_url
 
-**Scenario**: Default screen uses approved minimal style and no extra page structure
+**Scenario**: Default screen has no extra page structure
 **Given**: Page is displayed
 **When**: Visitor views the page
-**Then**: The page background is `#FFFFFF`, text color is `#000000`, no `nav` element is present, and `main` contains no section other than the greeting section
+**Then**: No `nav` element is present, and `main` contains no section other than the greeting section
+Traces: SC-5 (GREETING-001 AC-5)
+Check: render_url
+
+**Scenario**: Default screen uses approved minimal colors
+**Given**: Page is displayed
+**When**: Visitor views the page
+**Then**: The page background is `#FFFFFF` and text color is `#000000`
 Traces: SC-5 (GREETING-001 AC-5)
 Check: measure_styles
 
@@ -64,11 +71,11 @@ Traces: contract (GET /v1/greeting)
 Check: fetch_url
 
 **Scenario**: API returns internal error envelope for failed greeting query
-**Given**: Database is reachable, but the greeting query fails
+**Given**: Database is reachable, but the greeting query fails; no current automated fixture can arrange this while keeping the database connection available
 **When**: Client requests `GET /v1/greeting`
 **Then**: Response status is `500` and JSON body is exactly `{"error":{"code":"INTERNAL","message":"Internal server error."}}`
 Traces: contract (GET /v1/greeting)
-Check: fetch_url
+Check: manual
 
 **Scenario**: API returns unavailable envelope when database dependency is unavailable
 **Given**: Backend is running, but the database dependency refuses connections
@@ -83,7 +90,7 @@ Check: manual
 - SC-2 covered by: First load shows changed stored greeting
 - SC-3 covered by: Heading preserves internal spacing from storage
 - SC-4 covered by: Default screen contains one approved greeting section
-- SC-5 covered by: Default screen uses approved minimal style and no extra page structure
+- SC-5 covered by: Default screen has no extra page structure; Default screen uses approved minimal colors
 - SC-6 covered by: Long stored greeting wraps without horizontal page scroll
 - Contract `GET /v1/greeting` success covered by API success cases
 - Contract `GET /v1/greeting` `500 INTERNAL` covered by failed query case
