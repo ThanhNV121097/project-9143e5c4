@@ -1,12 +1,12 @@
-import { ShowPersistedGreeting } from "../components/ShowPersistedGreeting";
-import { getGreeting } from "../lib/show-persisted-greeting";
+import { EditPersistedGreeting } from "../components/EditPersistedGreeting";
+import { getGreeting } from "../lib/edit-persisted-greeting";
 
 export default async function Home() {
   const { greeting } = await getGreeting();
 
   return (
     <main>
-      <ShowPersistedGreeting initialGreeting={greeting} />
+      <EditPersistedGreeting initialGreeting={greeting} />
     </main>
   );
 }
