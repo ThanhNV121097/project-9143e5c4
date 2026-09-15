@@ -18,6 +18,7 @@
   font-weight: var(--font-weight-heading);
   letter-spacing: var(--tracking-tight-heading);
   overflow-wrap: anywhere;
+  white-space: pre-wrap;
 }
 
 .form {
