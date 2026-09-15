@@ -21,7 +21,7 @@ All non-success responses use:
 
 ### `GET /v1/greeting`
 
-Returns current shared greeting.
+Returns current shared greeting. Auth: none; public Visitor access.
 
 Success `200`:
 
@@ -60,3 +60,9 @@ Returns `200` with plain `ok` only after migrations and database probe succeed. 
 `PUT /v1/greeting` is unauthenticated because product has one shared public Visitor role. It updates only `greetings.text` for `id = 1`, sets `updated_at` to current time, and returns resulting trimmed text. Use one parameterized update statement; concurrent successful requests have no version check, so last completed write wins.
 
 Mock review: `GreetingResponse` is sound and matches contract response. Its `getMockGreeting` and `saveMockGreeting` localStorage functions are temporary UI behavior. Backend integration replaces those imports with API client calls; no component props or JSON fields change.
+
+## Show persisted greeting implementation decision
+
+`GET /v1/greeting` is unauthenticated because product has one shared public Visitor role. It performs one parameterized query for `greetings.text` where `id = 1`, returning `200` `{ "greeting": string }`. The UI mock shape is sound and already matches this contract; backend integration replaces `getGreeting` mock import with API client call only.
+
+No request body. Errors use shared envelope: `503 UNAVAILABLE` only when database connection is unavailable; failed query after connection returns `500 INTERNAL`. Missing row also returns `500 INTERNAL`: bootstrap seed is required invariant and no product error state exists.

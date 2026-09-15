@@ -30,3 +30,11 @@ Mock `GreetingResponse` is `{ "greeting": string }`; this matches existing API r
 Forward migration creates `schema_migrations`, creates `greetings` with `id smallint PRIMARY KEY CHECK (id = 1)`, `text text NOT NULL CHECK (btrim(text) <> '')`, and `updated_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP`, then inserts `(1, 'Hello, World!')` using `ON CONFLICT (id) DO NOTHING`. No foreign keys or secondary indexes: reads and writes target primary key `id = 1`.
 
 Backward migration drops `greetings`; then drops `schema_migrations` only if rolling back migration runner bootstrap. This destroys saved shared greeting, so use only before production data matters. Forward is safe on populated databases: table creation is additive and seed insert does not overwrite existing row.
+
+## Show persisted greeting design
+
+Mock module `code/frontend/lib/mock/show-persisted-greeting.ts` defines `GreetingResponse` as `{ "greeting": string }` and returns seeded text. Shape is sound: it matches the existing `GET /v1/greeting` response and heading needs one non-null string. Backend integration replaces only mock import with API client; no component props or JSON fields change.
+
+No schema changes: this story reads `greetings.text` from single row `id = 1`. Primary key serves query `SELECT text FROM greetings WHERE id = 1`; no secondary index or foreign key applies.
+
+Migration: none for this read-only story. It depends on shared greeting bootstrap migration above. Forward is safe on populated databases because it makes no change; backward has no story-specific step.
