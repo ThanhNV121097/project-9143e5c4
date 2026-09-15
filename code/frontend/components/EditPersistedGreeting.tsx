@@ -9,10 +9,16 @@ export type EditPersistedGreetingProps = {
 };
 
 export function EditPersistedGreeting({ initialGreeting }: EditPersistedGreetingProps) {
-  const currentGreeting = getMockGreeting().greeting;
-  const [greeting, setGreeting] = useState(currentGreeting || initialGreeting);
-  const [inputValue, setInputValue] = useState(currentGreeting || initialGreeting);
+  const [greeting, setGreeting] = useState(initialGreeting);
+  const [inputValue, setInputValue] = useState(initialGreeting);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const currentGreeting = getMockGreeting().greeting;
+
+    setGreeting(currentGreeting);
+    setInputValue(currentGreeting);
+  }, []);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
