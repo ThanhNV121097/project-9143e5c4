@@ -1,8 +1,8 @@
 import { EditPersistedGreeting } from "../components/EditPersistedGreeting";
-import { getMockGreeting } from "../lib/mock/edit-persisted-greeting";
+import { getGreeting } from "../lib/edit-persisted-greeting";
 
-export default function Home() {
-  const { greeting } = getMockGreeting();
+export default async function Home() {
+  const { greeting } = await getGreeting();
 
   return (
     <main>
