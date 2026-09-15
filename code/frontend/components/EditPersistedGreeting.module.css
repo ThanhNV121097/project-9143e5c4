@@ -1,0 +1,100 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - var(--space-12));
+  width: calc(100% - (var(--space-6) * 2));
+  max-width: calc((var(--space-12) * 11) + var(--space-8));
+  text-align: center;
+  margin-inline: auto;
+}
+
+.heading {
+  margin: var(--space-0) var(--space-0) var(--space-8);
+  color: var(--color-text);
+  font-size: var(--text-heading);
+  line-height: 1.05;
+  font-weight: var(--font-weight-heading);
+  letter-spacing: var(--tracking-tight-heading);
+  overflow-wrap: anywhere;
+}
+
+.form {
+  display: flex;
+  gap: var(--space-3);
+  width: 100%;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.label {
+  position: absolute;
+  width: var(--space-px);
+  height: var(--space-px);
+  padding: var(--space-0);
+  margin: calc(-1 * var(--space-px));
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: var(--space-0);
+}
+
+.input {
+  flex: 1;
+  min-width: var(--space-0);
+  height: var(--space-12);
+  border: var(--border-width) solid var(--color-text);
+  border-radius: var(--radius-square);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--text-control);
+  padding-block: var(--space-0);
+  padding-inline: calc(var(--space-3) + (var(--space-px) * 2));
+}
+
+.button {
+  height: var(--space-12);
+  border: var(--border-width) solid var(--color-primary-action);
+  border-radius: var(--radius-square);
+  background: var(--color-primary-action);
+  color: var(--color-bg);
+  font: inherit;
+  font-size: var(--text-button);
+  font-weight: var(--font-weight-action);
+  padding-block: var(--space-0);
+  padding-inline: calc(var(--space-5) + (var(--space-px) * 2));
+  cursor: pointer;
+}
+
+.input:focus,
+.button:focus {
+  outline: var(--focus-ring-width) solid var(--color-text);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.button:hover {
+  background: var(--color-primary-action);
+  color: var(--color-bg);
+}
+
+@media (max-width: 520px) {
+  .section {
+    min-height: calc(100vh - var(--space-10));
+    width: calc(100% - (var(--space-5) * 2));
+  }
+
+  .form {
+    flex-direction: column;
+  }
+
+  .input,
+  .button {
+    width: 100%;
+  }
+
+  .input {
+    flex: none;
+  }
+}
