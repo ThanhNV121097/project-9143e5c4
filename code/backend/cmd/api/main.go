@@ -3,9 +3,13 @@ package main
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
 	"io/fs"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"sort"
@@ -45,6 +49,7 @@ func main() {
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte("ok"))
 	})
+	mux.HandleFunc("GET /v1/greeting", getGreeting(db))
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = os.Getenv("APP_PORT")
@@ -53,6 +58,52 @@ func main() {
 		port = "8080"
 	}
 	log.Fatal(http.ListenAndServe(":"+port, mux))
+}
+
+type greetingResponse struct {
+	Greeting string `json:"greeting"`
+}
+
+type errorResponse struct {
+	Error errorBody `json:"error"`
+}
+
+type errorBody struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+func getGreeting(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var greeting string
+		err := db.QueryRowContext(r.Context(), `SELECT text FROM greetings WHERE id = $1`, 1).Scan(&greeting)
+		if err != nil {
+			if isUnavailable(err) || isUnavailable(r.Context().Err()) {
+				writeError(w, http.StatusServiceUnavailable, "UNAVAILABLE", "Service unavailable.")
+				return
+			}
+			writeError(w, http.StatusInternalServerError, "INTERNAL", "Internal server error.")
+			return
+		}
+		writeJSON(w, http.StatusOK, greetingResponse{Greeting: greeting})
+	}
+}
+
+func writeJSON(w http.ResponseWriter, status int, body any) {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(status)
+	_ = json.NewEncoder(w).Encode(body)
+}
+
+func writeError(w http.ResponseWriter, status int, code string, message string) {
+	writeJSON(w, status, errorResponse{Error: errorBody{Code: code, Message: message}})
+}
+
+func isUnavailable(err error) bool {
+	if err == nil {
+		return false
+	}
+	return errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) || errors.Is(err, io.ErrUnexpectedEOF) || errors.As(err, new(net.Error))
 }
 
 func migrate(ctx context.Context, db *sql.DB) error {
@@ -73,18 +124,29 @@ func migrate(ctx context.Context, db *sql.DB) error {
 	for _, name := range names {
 		var applied bool
 		if err := db.QueryRowContext(ctx, `SELECT EXISTS(SELECT 1 FROM schema_migrations WHERE version = $1)`, name).Scan(&applied); err != nil || applied {
-			if err != nil { return fmt.Errorf("check migration %s: %w", name, err) }
+			if err != nil {
+				return fmt.Errorf("check migration %s: %w", name, err)
+			}
 			continue
 		}
 		sqlBytes, err := migrations.Files.ReadFile(name)
-		if err != nil { return err }
+		if err != nil {
+			return err
+		}
 		tx, err := db.BeginTx(ctx, nil)
-		if err != nil { return err }
+		if err != nil {
+			return err
+		}
 		if _, err = tx.ExecContext(ctx, string(sqlBytes)); err == nil {
 			_, err = tx.ExecContext(ctx, `INSERT INTO schema_migrations (version) VALUES ($1)`, name)
 		}
-		if err != nil { _ = tx.Rollback(); return fmt.Errorf("apply migration %s: %w", name, err) }
-		if err = tx.Commit(); err != nil { return err }
+		if err != nil {
+			_ = tx.Rollback()
+			return fmt.Errorf("apply migration %s: %w", name, err)
+		}
+		if err = tx.Commit(); err != nil {
+			return err
+		}
 	}
 	return nil
 }
