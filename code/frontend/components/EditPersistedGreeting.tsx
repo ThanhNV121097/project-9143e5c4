@@ -13,14 +13,7 @@ export function EditPersistedGreeting({ initialGreeting }: EditPersistedGreeting
   const [inputValue, setInputValue] = useState(initialGreeting);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    const currentGreeting = getMockGreeting().greeting;
-
-    setGreeting(currentGreeting);
-    setInputValue(currentGreeting);
-  }, []);
-
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const nextGreeting = inputValue.trim();
