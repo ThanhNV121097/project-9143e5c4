@@ -90,7 +90,7 @@ Check: manual
 - SC-2 covered by: First load shows changed stored greeting
 - SC-3 covered by: Heading preserves internal spacing from storage
 - SC-4 covered by: Default screen contains one approved greeting section
-- SC-5 covered by: Default screen uses approved minimal style and no extra page structure
+- SC-5 covered by: Default screen has no extra page structure; Default screen uses approved minimal colors
 - SC-6 covered by: Long stored greeting wraps without horizontal page scroll
 - Contract `GET /v1/greeting` success covered by API success cases
 - Contract `GET /v1/greeting` `500 INTERNAL` covered by failed query case
