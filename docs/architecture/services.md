@@ -54,3 +54,9 @@ Errors use shared envelope: `400 MALFORMED_REQUEST`, `422 VALIDATION_FAILED`, `5
 ### `GET /healthz`
 
 Returns `200` with plain `ok` only after migrations and database probe succeed. Returns `503 UNAVAILABLE` otherwise. This endpoint is operational, not versioned product API.
+
+## Edit persisted greeting implementation decision
+
+`PUT /v1/greeting` is unauthenticated because product has one shared public Visitor role. It updates only `greetings.text` for `id = 1`, sets `updated_at` to current time, and returns resulting trimmed text. Use one parameterized update statement; concurrent successful requests have no version check, so last completed write wins.
+
+Mock review: `GreetingResponse` is sound and matches contract response. Its `getMockGreeting` and `saveMockGreeting` localStorage functions are temporary UI behavior. Backend integration replaces those imports with API client calls; no component props or JSON fields change.
