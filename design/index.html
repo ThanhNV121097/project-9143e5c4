@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hello World Acceptance 8</title>
+  <style>
+    :root {
+      --background: #FFFFFF;
+      --text: #000000;
+      --accent: #2563EB;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--background);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    main {
+      width: min(100%, 560px);
+    }
+
+    .greeting-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(100vh - 48px);
+      text-align: center;
+    }
+
+    .greeting-heading {
+      margin: 0 0 32px;
+      font-size: clamp(40px, 9vw, 80px);
+      line-height: 1.05;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      overflow-wrap: anywhere;
+    }
+
+    .greeting-form {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      justify-content: center;
+      align-items: stretch;
+    }
+
+    label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .greeting-input {
+      flex: 1;
+      min-width: 0;
+      height: 48px;
+      border: 1px solid var(--text);
+      border-radius: 0;
+      background: var(--background);
+      color: var(--text);
+      font: inherit;
+      font-size: 18px;
+      padding: 0 14px;
+    }
+
+    .save-button {
+      height: 48px;
+      border: 1px solid var(--accent);
+      border-radius: 0;
+      background: var(--accent);
+      color: var(--background);
+      font: inherit;
+      font-size: 18px;
+      font-weight: 700;
+      padding: 0 22px;
+      cursor: pointer;
+    }
+
+    .greeting-input:focus,
+    .save-button:focus {
+      outline: 3px solid var(--text);
+      outline-offset: 3px;
+    }
+
+    .save-button:hover {
+      background: var(--accent);
+      color: var(--background);
+    }
+
+    @media (max-width: 520px) {
+      body {
+        padding: 20px;
+      }
+
+      .greeting-section {
+        min-height: calc(100vh - 40px);
+      }
+
+      .greeting-form {
+        flex-direction: column;
+      }
+
+      .greeting-input,
+      .save-button {
+        width: 100%;
+      }
+
+      .greeting-input {
+        flex: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="greeting-section" aria-labelledby="greeting-heading">
+      <h1 id="greeting-heading" class="greeting-heading">Hello, World!</h1>
+      <form class="greeting-form" id="greeting-form" autocomplete="off">
+        <label for="greeting-input">Greeting</label>
+        <input class="greeting-input" id="greeting-input" name="greeting" type="text" value="Hello, World!" required>
+        <button class="save-button" type="submit">Save</button>
+      </form>
+    </section>
+  </main>
+  <script>
+    (function () {
+      var heading = document.getElementById('greeting-heading');
+      var form = document.getElementById('greeting-form');
+      var input = document.getElementById('greeting-input');
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        var nextGreeting = input.value.trim();
+        if (!nextGreeting) {
+          input.focus();
+          return;
+        }
+        heading.textContent = nextGreeting;
+        input.value = nextGreeting;
+      });
+    })();
+  </script>
+</body>
+</html>
