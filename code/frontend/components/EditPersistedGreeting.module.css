@@ -82,7 +82,7 @@
 @media (max-width: 520px) {
   .section {
     min-height: calc(100vh - var(--space-10));
-    width: min(calc(100% - (var(--space-5) * 2)), 560px);
+    width: calc(100% - (var(--space-5) * 2));
   }
 
   .form {
