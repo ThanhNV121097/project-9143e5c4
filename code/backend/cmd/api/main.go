@@ -48,6 +48,8 @@ func main() {
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte("ok"))
 	})
+	mux.HandleFunc("GET /v1/greeting", getGreeting(db))
+	mux.HandleFunc("PUT /v1/greeting", putGreeting(db))
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = os.Getenv("APP_PORT")
