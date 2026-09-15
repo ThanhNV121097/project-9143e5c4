@@ -50,7 +50,7 @@
   font: inherit;
   font-size: var(--text-control);
   font-weight: var(--font-weight-body);
-  padding: var(--space-0) 14px;
+  padding: var(--space-0) calc(var(--space-3) + var(--space-px) + var(--space-px));
 }
 
 .button {
@@ -62,7 +62,7 @@
   font: inherit;
   font-size: var(--text-button);
   font-weight: var(--font-weight-action);
-  padding: var(--space-0) 22px;
+  padding: var(--space-0) calc(var(--space-5) + var(--space-px) + var(--space-px));
   cursor: pointer;
 }
 
