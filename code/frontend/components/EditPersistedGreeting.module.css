@@ -4,9 +4,8 @@
   align-items: center;
   justify-content: center;
   min-height: calc(100vh - var(--space-12));
-  width: min(100%, 560px);
+  width: min(calc(100% - (var(--space-6) * 2)), 560px);
   text-align: center;
-  padding: var(--space-6);
   margin-inline: auto;
 }
 
