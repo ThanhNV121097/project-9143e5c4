@@ -35,10 +35,17 @@ Check: render_url
 Traces: SC-4 (GREETING-001 AC-4)
 Check: render_url
 
-**Scenario**: Default screen uses approved minimal style and no extra page structure
+**Scenario**: Default screen has no extra page structure
 **Given**: Page is displayed
 **When**: Visitor views the page
-**Then**: The page background is `#FFFFFF`, text color is `#000000`, no `nav` element is present, and `main` contains no section other than the greeting section
+**Then**: No `nav` element is present, and `main` contains no section other than the greeting section
+Traces: SC-5 (GREETING-001 AC-5)
+Check: render_url
+
+**Scenario**: Default screen uses approved minimal colors
+**Given**: Page is displayed
+**When**: Visitor views the page
+**Then**: The page background is `#FFFFFF` and text color is `#000000`
 Traces: SC-5 (GREETING-001 AC-5)
 Check: measure_styles
 
