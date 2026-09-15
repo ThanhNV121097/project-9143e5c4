@@ -1,5 +1,5 @@
 import { ShowPersistedGreeting } from "../components/ShowPersistedGreeting";
-import { getGreeting } from "../lib/mock/show-persisted-greeting";
+import { getGreeting } from "../lib/show-persisted-greeting";
 
 export default async function Home() {
   const { greeting } = await getGreeting();
