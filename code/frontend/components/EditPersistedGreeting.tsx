@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { getMockGreeting, saveMockGreeting } from "../lib/mock/edit-persisted-greeting";
 import styles from "./EditPersistedGreeting.module.css";
 
