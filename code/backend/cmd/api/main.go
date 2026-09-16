@@ -41,6 +41,7 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
+	mux.HandleFunc("GET /v1/greeting", getGreeting(db))
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) {
 		if err := db.PingContext(r.Context()); err != nil {
 			http.Error(w, "unavailable", http.StatusServiceUnavailable)
