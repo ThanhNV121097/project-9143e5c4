@@ -60,6 +60,52 @@ func main() {
 	log.Fatal(http.ListenAndServe(":"+port, mux))
 }
 
+type greetingResponse struct {
+	Greeting string `json:"greeting"`
+}
+
+type errorResponse struct {
+	Error errorBody `json:"error"`
+}
+
+type errorBody struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
+}
+
+func getGreeting(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var greeting string
+		err := db.QueryRowContext(r.Context(), `SELECT text FROM greetings WHERE id = $1`, 1).Scan(&greeting)
+		if err != nil {
+			if isUnavailable(err) || isUnavailable(r.Context().Err()) {
+				writeError(w, http.StatusServiceUnavailable, "UNAVAILABLE", "Service unavailable.")
+				return
+			}
+			writeError(w, http.StatusInternalServerError, "INTERNAL", "Internal server error.")
+			return
+		}
+		writeJSON(w, http.StatusOK, greetingResponse{Greeting: greeting})
+	}
+}
+
+func writeJSON(w http.ResponseWriter, status int, body any) {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(status)
+	_ = json.NewEncoder(w).Encode(body)
+}
+
+func writeError(w http.ResponseWriter, status int, code string, message string) {
+	writeJSON(w, status, errorResponse{Error: errorBody{Code: code, Message: message}})
+}
+
+func isUnavailable(err error) bool {
+	if err == nil {
+		return false
+	}
+	return errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) || errors.Is(err, io.ErrUnexpectedEOF) || errors.As(err, new(net.Error))
+}
+
 func migrate(ctx context.Context, db *sql.DB) error {
 	if _, err := db.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS schema_migrations (version text PRIMARY KEY, applied_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP)`); err != nil {
 		return fmt.Errorf("create migration table: %w", err)
